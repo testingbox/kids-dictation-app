@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小朋友默生字</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; text-align: center; background: #f0f8ff; }
+  h2 { font-size: 24px; margin-bottom: 15px; }
+  textarea { width: 100%; max-width: 400px; height: 180px; font-size: 18px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
+  button { 
+    display: block; 
+    width: 90%; 
+    max-width: 300px;
+    margin: 10px auto; 
+    padding: 15px; 
+    font-size: 20px; 
+    border: none; 
+    border-radius: 12px;
+    background: #4CAF50; 
+    color: white; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s, transform 0.1s;
+  }
+  button:hover { background: #45a049; }
+  button:active { background: #3e8e41; transform: scale(0.95); }
+  #wordDisplay { font-size: 32px; margin-top: 20px; color: #333; min-height: 40px; transition: opacity 0.5s; }
+  #counterDisplay { font-size: 20px; margin-top: 10px; color: #555; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- 第一版：輸入生字 -->
+<div id="inputPage">
+  <h2>輸入生字（每行一個）</h2>
+  <textarea id="wordInput" placeholder="例如：\n蘋果\n香蕉\n橙子"></textarea><br>
+  <button onclick="confirmWords()">✅ 確認</button>
+</div>
+
+<!-- 第二版：操作版 -->
+<div id="gamePage" class="hidden">
+  <h2>抽生字朗讀</h2>
+  <div id="counterDisplay">尚未開始</div>
+  <div id="wordDisplay">(請先抽出一個生字)</div>
+  <div>
+    <button onclick="drawWord()">🎲 抽出生字並朗讀</button>
+    <button onclick="showWord()">👁️‍🗨️ 顯示剛才生字</button>
+    <button onclick="replayWord()">🔊 重讀一次</button>
+    <button onclick="backToInput()">🔙 返回輸入頁</button>
+  </div>
+</div>
+
+<!-- 完成頁面 -->
+<div id="completePage" class="hidden">
+  <h2>🎉 恭喜！你已完成全部生字默書！</h2>
+  <button onclick="backToInput()">🔄 再來一次</button>
+</div>
+
+<script>
+let words = [];
+let currentWord = "";
+let voices = [];
+let selectedVoice = null;
+let counter = 0;
+
+function initVoices() {
+  voices = speechSynthesis.getVoices();
+  selectedVoice = voices.find(voice => voice.lang.includes('zh-HK') || voice.name.includes('Cantonese')) ||
+                  voices.find(voice => voice.lang.includes('zh-CN')) ||
+                  voices.find(voice => voice.lang.includes('en-US'));
+}
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = initVoices;
+}
+
+window.onload = function() {
+  setTimeout(initVoices, 500);
+};
+
+function confirmWords() {
+  const input = document.getElementById('wordInput').value.trim();
+  words = input.split('\n').map(word => word.trim()).filter(word => word);
+  if (words.length === 0) {
+    alert('請至少輸入一個生字！');
+    return;
+  }
+  document.getElementById('inputPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.remove('hidden');
+  counter = 0;
+  updateCounterDisplay();
+  document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
+}
+
+function drawWord() {
+  if (words.length === 0) {
+    alert('生字清單是空的，請重新輸入生字！');
+    return;
+  }
+  counter++;
+  updateCounterDisplay();
+  const index = Math.floor(Math.random() * words.length);
+  currentWord = words.splice(index, 1)[0];
+  fadeOutInWordDisplay();
+  speak("第" + counter + "個生字，" + currentWord);
+  if (words.length === 0) {
+    setTimeout(() => {
+      document.getElementById('gamePage').classList.add('hidden');
+      document.getElementById('completePage').classList.remove('hidden');
+    }, 800);
+  }
+}
+
+function showWord() {
+  if (!currentWord) {
+    alert('請先抽出一個生字！');
+    return;
+  }
+  document.getElementById('wordDisplay').textContent = currentWord;
+}
+
+function replayWord() {
+  if (!currentWord) {
+    alert('請先抽出一個生字！');
+    return;
+  }
+  speak(currentWord);
+}
+
+function backToInput() {
+  counter = 0;
+  currentWord = "";
+  document.getElementById('counterDisplay').textContent = "尚未開始";
+  document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
+  document.getElementById('gamePage').classList.add('hidden');
+  document.getElementById('completePage').classList.add('hidden');
+  document.getElementById('inputPage').classList.remove('hidden');
+}
+
+function updateCounterDisplay() {
+  document.getElementById('counterDisplay').textContent = "已默第 " + counter + " 個生字";
+}
+
+function speak(text) {
+  if (!text) return;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  if (!selectedVoice || voices.length === 0) {
+    initVoices();
+  }
+
+  if (selectedVoice) {
+    utterance.voice = selectedVoice;
+  }
+
+  utterance.rate = 0.9;
+  speechSynthesis.speak(utterance);
+}
+
+function fadeOutInWordDisplay() {
+  const wordDisplay = document.getElementById('wordDisplay');
+  wordDisplay.style.opacity = 0;
+  setTimeout(() => {
+    wordDisplay.textContent = "";
+    wordDisplay.style.opacity = 1;
+  }, 300);
+}
+</script>
+
+</body>
+</html>
