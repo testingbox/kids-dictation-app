@@ -132,7 +132,6 @@ function confirmWords() {
   document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
 }
 
-
 function drawWord() {
   if (activeWords.length === 0) {
     alert('全部生字已經默完！');
@@ -144,10 +143,8 @@ function drawWord() {
   updateCounterDisplay();
   const index = Math.floor(Math.random() * activeWords.length);
   currentWord = activeWords.splice(index, 1)[0];
-  fadeOutInWordDisplay();
+  fadeOutInWordDisplay(currentWord);
   speak(currentWord);
-  , 800);
-  }
 }
 
 function showWord() {
@@ -193,12 +190,15 @@ function speak(text) {
   speechSynthesis.speak(utterance);
 }
 
-function fadeOutInWordDisplay() {
+function fadeOutInWordDisplay(word="") {
   const wordDisplay = document.getElementById('wordDisplay');
   wordDisplay.style.opacity = 0;
   setTimeout(() => {
     wordDisplay.textContent = "";
-    wordDisplay.style.opacity = 1;
+    setTimeout(() => {
+      wordDisplay.textContent = word ? "" : "(請先抽出一個生字)";
+      wordDisplay.style.opacity = 1;
+    }, 100);
   }, 300);
 }
 
@@ -225,14 +225,15 @@ function saveCurrentWords() {
 function loadSavedListOptions() {
   const select = document.getElementById('savedLists');
   select.innerHTML = '<option value="">選擇已保存的清單</option>';
-  for (let key in localStorage) {
+  // 用 Object.keys(localStorage) 保證遍歷正確
+  Object.keys(localStorage).forEach(key => {
     if (key.startsWith('dictation-')) {
       const option = document.createElement('option');
       option.value = key;
       option.textContent = key.replace('dictation-', '');
       select.appendChild(option);
     }
-  }
+  });
 }
 
 function loadSavedWords() {
