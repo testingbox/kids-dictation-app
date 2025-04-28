@@ -84,6 +84,7 @@
 
 <script>
 let words = [];
+let activeWords = [];
 let currentWord = "";
 let voices = [];
 let selectedVoice = null;
@@ -122,6 +123,7 @@ function confirmWords() {
 
   document.getElementById('wordInput').value = uniqueWords.join(',');
   words = [...uniqueWords];
+  activeWords = [...uniqueWords];
 
   document.getElementById('inputPage').classList.add('hidden');
   document.getElementById('gamePage').classList.remove('hidden');
@@ -132,21 +134,19 @@ function confirmWords() {
 
 
 function drawWord() {
-  if (words.length === 0) {
-    alert('生字清單是空的，請重新輸入生字！');
+  if (activeWords.length === 0) {
+    alert('全部生字已經默完！');
+    document.getElementById('gamePage').classList.add('hidden');
+    document.getElementById('completePage').classList.remove('hidden');
     return;
   }
   counter++;
   updateCounterDisplay();
-  const index = Math.floor(Math.random() * words.length);
-  currentWord = words.splice(index, 1)[0];
+  const index = Math.floor(Math.random() * activeWords.length);
+  currentWord = activeWords.splice(index, 1)[0];
   fadeOutInWordDisplay();
   speak(currentWord);
-  if (words.length === 0) {
-    setTimeout(() => {
-      document.getElementById('gamePage').classList.add('hidden');
-      document.getElementById('completePage').classList.remove('hidden');
-    }, 800);
+  , 800);
   }
 }
 
