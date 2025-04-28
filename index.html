@@ -6,24 +6,41 @@
 <title>小朋友默生字</title>
 <style>
   body { font-family: sans-serif; padding: 20px; text-align: center; background: #f0f8ff; }
-  h2 { font-size: 24px; margin-bottom: 15px; }
-  textarea { width: 100%; max-width: 400px; height: 180px; font-size: 18px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
-  button { 
-    display: block; 
-    width: 90%; 
+  h1 { font-size: 28px; margin-bottom: 20px; }
+  h2 { font-size: 18px; margin-bottom: 15px; }
+  textarea { width: 100%; max-width: 400px; font-size: 18px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; height: 150px; }
+  select { width: 100%; max-width: 400px; font-size: 16px; padding: 8px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; }
+  .small-button {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #4CAF50;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s, transform 0.1s;
+    max-width: 120px;
+  }
+  .small-button:hover { background: #45a049; }
+  .small-button:active { background: #3e8e41; transform: scale(0.95); }
+  button.main-button {
+    display: block;
+    width: 90%;
     max-width: 300px;
-    margin: 10px auto; 
-    padding: 15px; 
-    font-size: 20px; 
-    border: none; 
+    margin: 10px auto;
+    padding: 15px;
+    font-size: 20px;
+    border: none;
     border-radius: 12px;
-    background: #4CAF50; 
-    color: white; 
+    background: #4CAF50;
+    color: white;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: background 0.2s, transform 0.1s;
   }
-  button:hover { background: #45a049; }
-  button:active { background: #3e8e41; transform: scale(0.95); }
+  button.main-button:hover { background: #45a049; }
+  button.main-button:active { background: #3e8e41; transform: scale(0.95); }
   #wordDisplay { font-size: 32px; margin-top: 20px; color: #333; min-height: 40px; transition: opacity 0.5s; }
   #counterDisplay { font-size: 20px; margin-top: 10px; color: #555; }
   .hidden { display: none; }
@@ -33,9 +50,17 @@
 
 <!-- 第一版：輸入生字 -->
 <div id="inputPage">
-  <h2>輸入生字（每行一個）</h2>
-  <textarea id="wordInput" placeholder="例如：\n蘋果\n香蕉\n橙子"></textarea><br>
-  <button onclick="confirmWords()">✅ 確認</button>
+  <h1>默生字小程式</h1>
+  <h2>輸入生字（以逗號分隔）</h2>
+  <textarea id="wordInput" placeholder="例如：蘋果,香蕉,橙子"></textarea><br>
+  <button class="main-button" onclick="confirmWords()">✅ 心中開始默生字</button>
+  <h2>📚 生字記錄管理</h2>
+  <select id="savedLists" onchange="loadSavedWords()">
+    <option value="">選擇已保存的清單</option>
+  </select><br>
+  <button class="small-button" onclick="saveCurrentWords()">💾 保存清單</button>
+  <button class="small-button" onclick="renameSelectedList()">✏️ 重新命名</button>
+  <button class="small-button" onclick="deleteSelectedList()">🗑️ 刪除清單</button>
 </div>
 
 <!-- 第二版：操作版 -->
@@ -44,17 +69,17 @@
   <div id="counterDisplay">尚未開始</div>
   <div id="wordDisplay">(請先抽出一個生字)</div>
   <div>
-    <button onclick="drawWord()">🎲 抽出生字並朗讀</button>
-    <button onclick="showWord()">👁️‍🗨️ 顯示剛才生字</button>
-    <button onclick="replayWord()">🔊 重讀一次</button>
-    <button onclick="backToInput()">🔙 返回輸入頁</button>
+    <button class="main-button" onclick="drawWord()">🎲 抽出生字並朗讀</button>
+    <button class="main-button" onclick="showWord()">👁️‍🗨️ 顯示剛才生字</button>
+    <button class="main-button" onclick="replayWord()">🔊 重讀一次</button>
+    <button class="main-button" onclick="backToInput()">🔙 返回輸入頁</button>
   </div>
 </div>
 
 <!-- 完成頁面 -->
 <div id="completePage" class="hidden">
   <h2>🎉 恭喜！你已完成全部生字默書！</h2>
-  <button onclick="backToInput()">🔄 再來一次</button>
+  <button class="main-button" onclick="backToInput()">🔄 再來一次</button>
 </div>
 
 <script>
@@ -76,22 +101,35 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 }
 
 window.onload = function() {
-  setTimeout(initVoices, 500);
+  setTimeout(() => {
+    initVoices();
+    loadSavedListOptions();
+  }, 500);
 };
 
 function confirmWords() {
   const input = document.getElementById('wordInput').value.trim();
-  words = input.split('\n').map(word => word.trim()).filter(word => word);
-  if (words.length === 0) {
+  let wordList = input.split(',')
+    .map(word => word.trim())
+    .filter(word => word);
+
+  const uniqueWords = [...new Set(wordList)];
+
+  if (uniqueWords.length === 0) {
     alert('請至少輸入一個生字！');
     return;
   }
+
+  document.getElementById('wordInput').value = uniqueWords.join(',');
+  words = [...uniqueWords];
+
   document.getElementById('inputPage').classList.add('hidden');
   document.getElementById('gamePage').classList.remove('hidden');
   counter = 0;
   updateCounterDisplay();
   document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
 }
+
 
 function drawWord() {
   if (words.length === 0) {
@@ -103,7 +141,7 @@ function drawWord() {
   const index = Math.floor(Math.random() * words.length);
   currentWord = words.splice(index, 1)[0];
   fadeOutInWordDisplay();
-  speak("第" + counter + "個生字，" + currentWord);
+  speak(currentWord);
   if (words.length === 0) {
     setTimeout(() => {
       document.getElementById('gamePage').classList.add('hidden');
@@ -144,17 +182,13 @@ function updateCounterDisplay() {
 
 function speak(text) {
   if (!text) return;
-
   const utterance = new SpeechSynthesisUtterance(text);
-
   if (!selectedVoice || voices.length === 0) {
     initVoices();
   }
-
   if (selectedVoice) {
     utterance.voice = selectedVoice;
   }
-
   utterance.rate = 0.9;
   speechSynthesis.speak(utterance);
 }
@@ -166,6 +200,78 @@ function fadeOutInWordDisplay() {
     wordDisplay.textContent = "";
     wordDisplay.style.opacity = 1;
   }, 300);
+}
+
+function saveCurrentWords() {
+  const input = document.getElementById('wordInput').value.trim();
+  if (!input) {
+    alert('請先輸入生字內容！');
+    return;
+  }
+  const name = prompt('請輸入清單名稱（例如：英文默書）：');
+  if (name === null) {
+    alert('取消了保存。');
+    return;
+  }
+  if (name.trim() === "") {
+    alert('請輸入有效的清單名稱！');
+    return;
+  }
+  localStorage.setItem('dictation-' + name.trim(), input);
+  loadSavedListOptions();
+  alert('已保存生字清單！');
+}
+
+function loadSavedListOptions() {
+  const select = document.getElementById('savedLists');
+  select.innerHTML = '<option value="">選擇已保存的清單</option>';
+  for (let key in localStorage) {
+    if (key.startsWith('dictation-')) {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = key.replace('dictation-', '');
+      select.appendChild(option);
+    }
+  }
+}
+
+function loadSavedWords() {
+  const select = document.getElementById('savedLists');
+  const key = select.value;
+  if (!key) return;
+  const data = localStorage.getItem(key);
+  document.getElementById('wordInput').value = data;
+  alert('已載入生字清單！');
+}
+
+function deleteSelectedList() {
+  const select = document.getElementById('savedLists');
+  const key = select.value;
+  if (!key) {
+    alert('請先選擇一個清單');
+    return;
+  }
+  if (confirm('確定要刪除這個生字清單？')) {
+    localStorage.removeItem(key);
+    loadSavedListOptions();
+    alert('已刪除清單！');
+  }
+}
+
+function renameSelectedList() {
+  const select = document.getElementById('savedLists');
+  const oldKey = select.value;
+  if (!oldKey) {
+    alert('請先選擇一個清單');
+    return;
+  }
+  const newName = prompt('請輸入新的清單名稱：');
+  if (!newName) return;
+  const data = localStorage.getItem(oldKey);
+  localStorage.removeItem(oldKey);
+  localStorage.setItem('dictation-' + newName.trim(), data);
+  loadSavedListOptions();
+  alert('已重新命名清單！');
 }
 </script>
 
