@@ -6,134 +6,98 @@
   <title>小朋友默生字</title>
   <style>
     body { font-family: sans-serif; padding: 20px; text-align: center; background: #f0f8ff; }
-    h1 { font-size: 28px; margin-bottom: 20px; }
-    h2 { font-size: 18px; margin-bottom: 15px; }
-    textarea { width: 100%; max-width: 400px; font-size: 18px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; height: 150px; }
-    select { width: 100%; max-width: 400px; font-size: 16px; padding: 8px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    h2 { font-size: 16px; margin: 10px 0; }
+    textarea { width: 100%; font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; height: 120px; box-sizing: border-box; }
+    .button-row { display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; margin: 10px auto; max-width: 320px; }
+    .button-row .small-button:first-child { flex: 0 0 90px; }
+    .button-row .small-button:last-child { flex: 1 1 200px; }
+    .list-buttons, .game-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; align-items: center; }
+    .list-buttons .small-button, .game-buttons .small-button { min-width: 150px; }
     .small-button {
-      display: inline-block;
-      margin: 5px;
-      padding: 8px 12px;
+      padding: 10px;
       font-size: 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #4CAF50;
       color: white;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: background 0.2s, transform 0.1s;
-      max-width: 120px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .small-button:hover { background: #45a049; }
-    .small-button:active { background: #3e8e41; transform: scale(0.95); }
-    button.main-button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 15px;
-      font-size: 20px;
-      border: none;
-      border-radius: 12px;
-      background: #4CAF50;
-      color: white;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: background 0.2s, transform 0.1s;
+    select {
+      width: 100%;
+      font-size: 14px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin: 5px 0;
     }
-    button.main-button:hover { background: #45a049; }
-    button.main-button:active { background: #3e8e41; transform: scale(0.95); }
-    #wordDisplay { font-size: 32px; margin-top: 20px; color: #333; min-height: 40px; transition: opacity 0.5s; }
-    #counterDisplay { font-size: 20px; margin-top: 10px; color: #555; }
+    #wordDisplay { font-size: 24px; margin-top: 20px; color: #333; min-height: 40px; }
+    #counterDisplay { font-size: 16px; margin-top: 10px; color: #555; }
     .hidden { display: none; }
   </style>
 </head>
 <body>
-
   <div id="inputPage">
     <h1>默生字小程式</h1>
-    <h2>輸入生字（以逗號分隔）</h2>
-    <textarea id="wordInput" placeholder="例如：蘋果,香蕉,橙子"></textarea><br>
-    <button class="small-button" onclick="clearWords()">清空生字</button>
-    <button class="main-button" onclick="confirmWords()">✅ 心中開始默生字</button>
+    <h2>輸入生字，以逗號分隔</h2>
+    <textarea id="wordInput" placeholder="例如：蘋果,香蕉,橙子"></textarea>
+    <div class="button-row">
+      <button class="small-button" onclick="clearWords()">清空生字</button>
+      <button class="small-button" onclick="confirmWords()">✅ 心中試默</button>
+    </div>
     <h2>📚 生字記錄管理</h2>
     <select id="savedLists" onchange="loadSavedWords()">
       <option value="">選擇已保存的清單</option>
-    </select><br>
-    <button class="small-button" onclick="saveCurrentWords()">💾 保存清單</button>
-    <button class="small-button" onclick="renameSelectedList()">✏️ 重新命名</button>
-    <button class="small-button" onclick="deleteSelectedList()">🗑️ 刪除清單</button>
+    </select>
+    <div class="list-buttons">
+      <button class="small-button" onclick="saveCurrentWords()">💾 儲存清單</button>
+      <button class="small-button" onclick="renameSelectedList()">✏️ 重新命名</button>
+      <button class="small-button" onclick="deleteSelectedList()">🗑️ 刪除清單</button>
+    </div>
   </div>
 
   <div id="gamePage" class="hidden">
     <h2>抽生字朗讀</h2>
     <div id="counterDisplay">尚未開始</div>
-    <div id="wordDisplay">(請先抽出一個生字)</div>
-    <div>
-      <button class="main-button" onclick="drawWord()">🎲 抽出生字並朗讀</button>
-      <button class="main-button" onclick="showWord()">👁️‍🗨️ 顯示剛才生字</button>
-      <button class="main-button" onclick="replayWord()">🔊 重讀一次</button>
-      <button class="main-button" onclick="backToInput()">🔙 返回輸入頁</button>
+    <div id="wordDisplay">（請先抽出一個生字）</div>
+    <div class="game-buttons">
+      <button class="small-button" onclick="drawWord()">🎲 抽讀生字</button>
+      <button class="small-button" onclick="replayWord()">🔁 重讀生字</button>
+      <button class="small-button" onclick="showWord()">👁️ 顯示生字</button>
+      <button class="small-button" onclick="backToInput()">🔙 返回主頁</button>
     </div>
   </div>
 
   <div id="completePage" class="hidden">
-    <h2>🎉 恭喜！你已完成全部<span id="totalWords"></span>個生字默書！</h2>
-    <button class="main-button" onclick="backToInput()">🔄 再來一次</button>
+    <h2>🎉 完成！你已默完 <span id="totalWords"></span> 個生字！</h2>
+    <button class="small-button" onclick="backToInput()">🔄 再來一次</button>
   </div>
 
   <script>
-    let words = [];
-    let activeWords = [];
-    let currentWord = "";
-    let voices = [];
-    let selectedVoice = null;
-    let counter = 0;
+    let words = [], activeWords = [], currentWord = "", counter = 0;
 
-    function initVoices() {
-      voices = speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        selectedVoice = voices.find(voice => voice.lang.includes('zh-HK') || voice.name.includes('Cantonese')) ||
-                        voices.find(voice => voice.lang.includes('zh-CN')) ||
-                        voices.find(voice => voice.lang.includes('en-US'));
-      }
+    function clearWords() {
+      document.getElementById('wordInput').value = "";
     }
-
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = initVoices;
-    }
-
-    window.onload = function() {
-      setTimeout(() => {
-        initVoices();
-        loadSavedListOptions();
-      }, 500);
-    };
 
     function confirmWords() {
       const input = document.getElementById('wordInput').value.trim();
-      let wordList = input.split(',')
-        .map(word => word.trim())
-        .filter(word => word);
-
+      let wordList = input.split(',').map(word => word.trim()).filter(word => word);
       const uniqueWords = [...new Set(wordList)];
-
       if (uniqueWords.length === 0) {
         alert('請至少輸入一個生字！');
         return;
       }
-
       document.getElementById('wordInput').value = uniqueWords.join(',');
       words = [...uniqueWords];
       activeWords = [...uniqueWords];
-
+      counter = 0;
+      currentWord = "";
+      document.getElementById('counterDisplay').textContent = '尚未開始';
+      document.getElementById('wordDisplay').textContent = '（請先抽出一個生字）';
       document.getElementById('inputPage').classList.add('hidden');
       document.getElementById('gamePage').classList.remove('hidden');
-      counter = 0;
-      updateCounterDisplay();
-      document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
-    }
-
-    function clearWords() {
-      document.getElementById('wordInput').value = "";
     }
 
     function drawWord() {
@@ -143,11 +107,12 @@
         document.getElementById('completePage').classList.remove('hidden');
         return;
       }
-      counter++;
-      updateCounterDisplay();
       const index = Math.floor(Math.random() * activeWords.length);
-      currentWord = activeWords.splice(index, 1)[0];
-      fadeOutInWordDisplay();
+      currentWord = activeWords[index];
+      activeWords.splice(index, 1);
+      counter++;
+      document.getElementById('wordDisplay').textContent = '（請使用顯示鍵查看）';
+      document.getElementById('counterDisplay').textContent = `已默第 ${counter} 個，尚餘 ${activeWords.length} 個`;
       speak(currentWord);
     }
 
@@ -156,7 +121,7 @@
         alert('請先抽出一個生字！');
         return;
       }
-      document.getElementById('wordDisplay').textContent = currentWord;
+      alert('剛才抽到的生字是：' + currentWord);
     }
 
     function replayWord() {
@@ -167,45 +132,18 @@
       speak(currentWord);
     }
 
-    function backToInput() {
-      counter = 0;
-      currentWord = "";
-      document.getElementById('counterDisplay').textContent = "尚未開始";
-      document.getElementById('wordDisplay').textContent = "(請先抽出一個生字)";
-      document.getElementById('gamePage').classList.add('hidden');
-      document.getElementById('completePage').classList.add('hidden');
-      document.getElementById('inputPage').classList.remove('hidden');
-    }
-
-    function updateCounterDisplay() {
-      const remainingWords = activeWords.length;
-      let counterText = "已默第 " + counter + " 個生字";
-      if (remainingWords <= 5) {
-        counterText += "，還剩 " + remainingWords + " 個生字";
-      }
-      document.getElementById('counterDisplay').textContent = counterText;
-    }
-
     function speak(text) {
       if (!text) return;
       const utterance = new SpeechSynthesisUtterance(text);
-      if (voices.length > 0 && selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
+      utterance.lang = 'zh-HK';
       utterance.rate = 0.9;
       speechSynthesis.speak(utterance);
     }
 
-    function fadeOutInWordDisplay(word="") {
-      const wordDisplay = document.getElementById('wordDisplay');
-      wordDisplay.style.opacity = 0;
-      setTimeout(() => {
-        wordDisplay.textContent = "";
-        setTimeout(() => {
-          wordDisplay.textContent = word ? "" : "(請先抽出一個生字)";
-          wordDisplay.style.opacity = 1;
-        }, 100);
-      }, 300);
+    function backToInput() {
+      document.getElementById('inputPage').classList.remove('hidden');
+      document.getElementById('gamePage').classList.add('hidden');
+      document.getElementById('completePage').classList.add('hidden');
     }
 
     function saveCurrentWords() {
@@ -215,23 +153,18 @@
         return;
       }
       const name = prompt('請輸入清單名稱（例如：英文默書）：');
-      if (name === null) {
-        alert('取消了保存。');
-        return;
-      }
-      if (name.trim() === "") {
-        alert('請輸入有效的清單名稱！');
+      if (!name || name.trim() === '') {
+        alert('取消或名稱無效');
         return;
       }
       localStorage.setItem('dictation-' + name.trim(), input);
       loadSavedListOptions();
-      showAlert('已保存生字清單！');
+      alert('已保存生字清單！');
     }
 
     function loadSavedListOptions() {
       const select = document.getElementById('savedLists');
       select.innerHTML = '<option value="">選擇已保存的清單</option>';
-      // 用 Object.keys(localStorage) 保證遍歷正確
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('dictation-')) {
           const option = document.createElement('option');
@@ -248,7 +181,7 @@
       if (!key) return;
       const data = localStorage.getItem(key);
       document.getElementById('wordInput').value = data;
-      showAlert('已載入生字清單！');
+      alert('已載入生字清單！');
     }
 
     function deleteSelectedList() {
@@ -261,7 +194,7 @@
       if (confirm('確定要刪除這個生字清單？')) {
         localStorage.removeItem(key);
         loadSavedListOptions();
-        showAlert('已刪除清單！');
+        alert('已刪除清單！');
       }
     }
 
@@ -278,27 +211,10 @@
       localStorage.removeItem(oldKey);
       localStorage.setItem('dictation-' + newName.trim(), data);
       loadSavedListOptions();
-      showAlert('已重新命名清單！');
+      alert('已重新命名清單！');
     }
 
-    function showAlert(message) {
-      const alert = document.createElement('div');
-      alert.textContent = message;
-      alert.style.position = 'fixed';
-      alert.style.top = '20px';
-      alert.style.left = '50%';
-      alert.style.transform = 'translateX(-50%)';
-      alert.style.background = 'rgba(0, 0, 0, 0.8)';
-      alert.style.color = 'white';
-      alert.style.padding = '10px 20px';
-      alert.style.borderRadius = '5px';
-      alert.style.zIndex = '9999';
-      document.body.appendChild(alert);
-      setTimeout(() => {
-        alert.remove();
-      }, 2000);
-    }
+    window.onload = loadSavedListOptions;
   </script>
-
 </body>
 </html>
