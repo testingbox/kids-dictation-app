@@ -5,35 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小朋友默生字</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; text-align: center; background: #f0f8ff; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    h2 { font-size: 16px; margin: 10px 0; }
-    textarea { width: 100%; font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; height: 120px; box-sizing: border-box; }
-    .button-row { display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; margin: 10px auto; max-width: 320px; }
-    .button-row .small-button:first-child { flex: 0 0 90px; }
-    .button-row .small-button:last-child { flex: 1 1 200px; }
-    .list-buttons, .game-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; align-items: center; }
-    .list-buttons .small-button, .game-buttons .small-button { min-width: 150px; }
+    body { font-family: sans-serif; padding: 24px; text-align: center; background: #f0f8ff; }
+    h1 { font-size: 28px; margin-bottom: 14px; }
+    h2 { font-size: 20px; margin: 12px 0; }
+    textarea {
+      width: 100%; font-size: 18px; padding: 14px;
+      border-radius: 12px; border: 1px solid #ccc; height: 140px; box-sizing: border-box;
+    }
+    .button-row { display: flex; justify-content: center; flex-wrap: nowrap; gap: 12px; margin: 12px auto; max-width: 340px; }
+    .button-row .small-button:first-child { flex: 0 0 100px; }
+    .button-row .small-button:last-child { flex: 1 1 220px; }
+    .list-buttons, .game-buttons {
+      display: flex; flex-direction: column; gap: 12px;
+      margin-top: 12px; align-items: center;
+    }
+    .list-buttons .small-button, .game-buttons .small-button {
+      min-width: 170px; font-size: 16px;
+    }
     .small-button {
-      padding: 10px;
-      font-size: 14px;
+      padding: 12px;
+      font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #4CAF50;
       color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
     select {
       width: 100%;
-      font-size: 14px;
-      padding: 8px;
-      border-radius: 8px;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
-      margin: 5px 0;
+      margin: 6px 0;
     }
-    #wordDisplay { font-size: 24px; margin-top: 20px; color: #333; min-height: 40px; }
-    #counterDisplay { font-size: 16px; margin-top: 10px; color: #555; }
+    #wordDisplay {
+      font-size: 28px; margin-top: 24px; color: #333;
+      min-height: 44px;
+    }
+    #counterDisplay { font-size: 18px; margin-top: 12px; color: #555; }
     .hidden { display: none; }
   </style>
 </head>
@@ -216,5 +227,4 @@
 
     window.onload = loadSavedListOptions;
   </script>
-</body>
 </html>
